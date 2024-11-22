@@ -9,6 +9,7 @@ option(USE_PROTOBUF "Serialize and deserialize tensors" OFF)
 option(BUILD_NNET "Build nnet" OFF)
 option(BUILD_DIST "Build project for distributed running" OFF)
 option(BUILD_TEST "Build tests" OFF)
+option(SUP_CODE_GEN "Support code generate" OFF)
 
 if(USE_CUDA)
     message("CMake 3.18 or higher is required for setting CUDAToolkit")
@@ -96,6 +97,10 @@ include_directories(3rd-party/pybind11/include)
 add_subdirectory(3rd-party/nlohmann_json_cmake_fetchcontent)
 include_directories(3rd-party/nlohmann_json_cmake_fetchcontent/single_include)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+add_subdirectory(3rd-party/fmt)
+include_directories(3rd-party/fmt/include)
+
 # TVM backend
 if(BUILD_NNET AND BUILD_TEST)
   # TVM and DMLC for invoking TVM packed functions
@@ -162,6 +167,11 @@ if(USE_INTELCPU)
   list (APPEND SRC ${SRC_INTELCPU})
 endif()
 
+if(SUP_CODE_GEN)
+file(GLOB_RECURSE CUS_OPS_SRC src/code_gen/*.cc src/code_gen/custom_ops.cu)
+list(APPEND SRC ${CUS_OPS_SRC})
+endif()
+
 # Libraries
 add_library(InfiniTensor SHARED ${SRC})
 if(USE_PROTOBUF)
@@ -169,6 +179,14 @@ if(USE_PROTOBUF)
 endif()
 
 target_link_libraries(InfiniTensor pybind11::embed)
+target_link_libraries(InfiniTensor fmt::fmt)
+
+if(SUP_CODE_GEN)
+set_target_properties(InfiniTensor PROPERTIES CUDA_ARCHITECTURES "70;80")
+enable_language(CUDA)
+find_package(CUDAToolkit)
+target_link_libraries(InfiniTensor cudnn CUDA::curand CUDA::cublas CUDA::nvrtc CUDA::cudart CUDA::cuda_driver)
+endif()
 
 # TVM backend
 if(BUILD_NNET AND BUILD_TEST AND TVM_LIB_DIR)
@@ -405,5 +423,184 @@ if(BUILD_TEST)
     # Build expression reader
     add_executable(nnet_reader test/nnet/readlog.cc)
     target_link_libraries(nnet_reader InfiniTensor)
+  endif()
+
+  if(SUP_CODE_GEN)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/code_gen")
+    add_executable(conv1 test/code_generate/conv_test_1.cc)
+    target_link_libraries(conv1 InfiniTensor)
+
+    build_test(test/code_generate/conv_test_2.cc)
+    #target_link_libraries(conv2 InfiniTensor)
+
+    build_test(test/code_generate/conv_test_3.cc)
+    #target_link_libraries(conv3 InfiniTensor)
+
+    add_executable(conv4 test/code_generate/conv_test_4_perf.cc)
+    target_link_libraries(conv4 InfiniTensor)
+
+    build_test(test/code_generate/conv_test_5_trans_kernel.cc)
+    #target_link_libraries(conv5 InfiniTensor)
+
+    build_test(test/code_generate/convtrans_test_1.cc)
+    #target_link_libraries(convtrans1 InfiniTensor)
+
+    build_test(test/code_generate/convtrans_test_2.cc)
+    #target_link_libraries(convtrans2 InfiniTensor)
+
+    add_executable(dilation test/code_generate/dilation_test.cpp)
+    target_link_libraries(dilation InfiniTensor)
+
+    build_test(test/code_generate/SampleGraph1.cpp)
+
+    build_test(test/code_generate/SampleGraph2.cpp)
+
+    build_test(test/code_generate/SampleGraph3.cpp)
+
+    build_test(test/code_generate/SampleGraph4.cpp)
+
+    build_test(test/code_generate/mutant_test_1.cc)
+
+    build_test(test/code_generate/mutant_test_2.cc)
+
+    build_test(test/code_generate/mutant_test_3.cc)
+
+    add_executable(transpose_test_1 test/code_generate/transpose_test_1.cc)
+    target_link_libraries(transpose_test_1 InfiniTensor)
+
+    build_test(test/code_generate/transpose_test_2.cc)
+
+    build_test(test/code_generate/transpose_test_3.cc)
+
+    build_test(test/code_generate/transpose_test_4.cc)
+
+    build_test(test/code_generate/transpose_test_5.cc)
+
+    build_test(test/code_generate/tensor_test.cc)
+
+    build_test(test/code_generate/single_rule_test_1_n2h.cc)
+    #target_link_libraries(rule1 InfiniTensor)
+
+    build_test(test/code_generate/single_rule_test_2_n2w.cc)
+    #target_link_libraries(rule2 InfiniTensor)
+
+    build_test(test/code_generate/single_rule_test_3_c2h.cc)
+    #target_link_libraries(rule3 InfiniTensor)
+
+    build_test(test/code_generate/single_rule_test_4_c2w.cc)
+    #target_link_libraries(rule4 InfiniTensor)
+
+    build_test(test/code_generate/single_rule_test_5_dilated.cc)
+    #target_link_libraries(rule5 InfiniTensor)
+
+    build_test(test/code_generate/single_rule_test_6_bgemm.cc)
+    #target_link_libraries(rule6 InfiniTensor)
+
+    build_test(test/code_generate/single_rule_test_7_trans_gemm.cc)
+    #target_link_libraries(rule7 InfiniTensor)
+
+    build_test(test/code_generate/single_rule_test_8_conv2group.cc)
+    #target_link_libraries(rule8 InfiniTensor)
+
+    build_test(test/code_generate/single_rule_test_9_group_conv_a.cc)
+
+    build_test(test/code_generate/single_rule_test_10_group_conv_b.cc)
+    #target_link_libraries(rule10 InfiniTensor)
+
+    build_test(test/code_generate/single_rule_test_11_group_conv_c.cc)
+    #target_link_libraries(rule11 InfiniTensor)
+
+    build_test(test/code_generate/single_rule_test_12_1xk_trans.cc)
+    #target_link_libraries(rule12 InfiniTensor)
+
+    build_test(test/code_generate/single_rule_test_13_nx1xk_trans.cc)
+    #target_link_libraries(rule13 InfiniTensor)
+
+    build_test(test/code_generate/single_rule_test_14_split_group_conv.cc)
+    #target_link_libraries(rule14 InfiniTensor)
+
+    build_test(test/code_generate/single_rule_test_15_conv_1x1.cc)
+    #target_link_libraries(rule15 InfiniTensor)
+
+    build_test(test/code_generate/single_rule_test_16_group_conv_d.cc)
+    #target_link_libraries(rule16 InfiniTensor)
+
+    build_test(test/code_generate/single_op_test_1.cc)
+    #target_link_libraries(op1 InfiniTensor)
+
+    build_test(test/code_generate/single_op_test_2.cc)
+    #target_link_libraries(op2 InfiniTensor)
+
+    build_test(test/code_generate/single_op_test_3.cc)
+    #target_link_libraries(op3 InfiniTensor)
+
+    add_executable(op4 test/code_generate/single_op_test_4.cc)
+    target_link_libraries(op4 InfiniTensor)
+
+    add_executable(op5 test/code_generate/single_op_test_5.cc)
+    target_link_libraries(op5 InfiniTensor)
+
+    build_test(test/code_generate/single_op_test_6.cc)
+    #target_link_libraries(op6 InfiniTensor)
+
+    build_test(test/code_generate/single_op_test_7_batch_gemm.cc)
+    #target_link_libraries(op7 InfiniTensor)
+
+    build_test(test/code_generate/eliminator_test_1.cc)
+    #target_link_libraries(te1 InfiniTensor)
+
+    build_test(test/code_generate/split_test_1.cc)
+    #target_link_libraries(split1 InfiniTensor)
+
+    build_test(test/code_generate/split_test_2.cc)
+    #target_link_libraries(split2 InfiniTensor)
+
+    build_test(test/code_generate/split_test_3.cc)
+    #target_link_libraries(split3 InfiniTensor)
+
+    build_test(test/code_generate/concat_test_1.cc)
+    #target_link_libraries(concat1 InfiniTensor)
+
+    build_test(test/code_generate/extend_test_1.cc)
+    #target_link_libraries(extend1 InfiniTensor)
+
+    build_test(test/code_generate/group_conv_test_1.cc)
+    #target_link_libraries(group1 InfiniTensor)
+
+    build_test(test/code_generate/group_conv_test_2.cc)
+    #target_link_libraries(group2 InfiniTensor)
+
+    build_test(test/code_generate/fuse_activation.cpp)
+    #target_link_libraries(fuse_activation InfiniTensor)
+
+    build_test(test/code_generate/gen_transpose.cpp)
+    #target_link_libraries(gen_transpose InfiniTensor)
+
+    build_test(test/code_generate/graph_stat_test_1_transpose_group.cc)
+    #target_link_libraries(stat_graph1 InfiniTensor)
+
+    build_test(test/code_generate/graph_stat_test_2_batchmm.cc)
+    #target_link_libraries(stat_graph2 InfiniTensor)
+
+    build_test(test/code_generate/pad_slice_test.cc)
+    #target_link_libraries(pad_slice InfiniTensor)
+
+    build_test(test/code_generate/batch_gemm_test.cc)
+    #target_link_libraries(bgemm InfiniTensor)
+
+    add_executable(gemm1 test/code_generate/gemm_test_1_perf.cc)
+    target_link_libraries(gemm1 InfiniTensor)
+
+    build_test(test/code_generate/perf_pool.cc)
+    #target_link_libraries(perf_pool InfiniTensor)
+
+    build_test(test/code_generate/cache_test_1.cc)
+    #target_link_libraries(cache1 InfiniTensor)
+
+    build_test(test/code_generate/cache_test_2.cc)
+    #target_link_libraries(cache2 InfiniTensor)
+
+    build_test(test/code_generate/cache_test_3.cc)
+    #target_link_libraries(cache3 InfiniTensor)
   endif()
 endif()
