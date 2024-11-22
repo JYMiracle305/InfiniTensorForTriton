@@ -13,9 +13,6 @@
 [submodule "examples/distributed/onnxsim_large_model"]
 	path = examples/distributed/onnxsim_large_model
 	url = git@github.com:luchangli03/onnxsim_large_model.git
-[submodule "3rd_party/fmt"]
-	path = 3rd_party/fmt
-	url = git@github.com:fmtlib/fmt.git
 [submodule "3rd-party/fmt"]
 	path = 3rd-party/fmt
 	url = git@github.com:fmtlib/fmt.git
