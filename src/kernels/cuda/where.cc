@@ -3,7 +3,7 @@
 #include "cuda/cuda_runtime.h"
 #include "cuda/cuda_where.h"
 #include "utils/operator_utils.h"
-#include "ffi/ffi_infinitensor_triton.h"
+#include "triton_op/infinitensor_triton.h"
 
 namespace infini {
 

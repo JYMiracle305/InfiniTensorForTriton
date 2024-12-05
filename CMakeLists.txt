@@ -192,7 +192,8 @@ if(NOT PythonLibs_FOUND)
     message(FATAL_ERROR "Python libraries not found")
 endif()
 
-add_library(tritonOp SHARED src/ffi/ffi_infinitensor_triton.cc)
+file(GLOB_RECURSE TRITON_OP_SRC src/triton_op/*.cc)
+add_library(tritonOp SHARED ${TRITON_OP_SRC})
 
 # target_link_libraries(tritonOp PRIVATE
 #     TritonCore::triton-core-serverapi
@@ -206,7 +207,7 @@ add_library(tritonOp SHARED src/ffi/ffi_infinitensor_triton.cc)
 target_link_libraries(InfiniTensor tritonOp)
 
 # 链接到应用算子的执行文件
-add_executable(execu_op src/ffi/main_test.cc)
+add_executable(execu_op src/main_test.cc)
 target_link_libraries(execu_op PRIVATE
     tritonOp
     ${PYTHON_LIBRARIES}

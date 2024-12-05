@@ -1,5 +1,5 @@
 #include <iostream>
-#include "ffi/ffi_infinitensor_triton.h"
+#include "triton_op/infinitensor_triton.h"
 
 using namespace infini;
 
