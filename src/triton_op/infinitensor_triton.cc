@@ -36,8 +36,6 @@ void print_test_add() {
         sys.attr("path").attr("insert")(0, py::str(op_module_path));
         sys.attr("path").attr("insert")(0, py::str(python_module_path));
 
-
-
         // 导入 vector_add 模块
         py::module_ main_module = py::module_::import("vector_add");
         py::object vector_add = main_module.attr("vector_add");

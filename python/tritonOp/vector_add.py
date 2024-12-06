@@ -44,7 +44,7 @@ def vector_add(a: list, b: list) -> torch.Tensor:
     return output_buffer
 
 def main():
-    # 创建两个随机的 PyTorch 张量
+    # 创建两个随机list
     a = [1, 2, 3]
     b = [4, 5, 6]
 
