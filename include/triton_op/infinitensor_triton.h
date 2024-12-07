@@ -6,6 +6,7 @@
 
 namespace infini {
 void print_test_add();
+void print_test_add_ninetoothed();
 void whereKernel_py(const float *inputX, const float *inputY,
                  const uint8_t *condition, float *output, int nDims,
                  int outputsize, SmallArray inputXShape, SmallArray inputYShape,
