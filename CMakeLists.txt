@@ -193,6 +193,7 @@ if(NOT PythonLibs_FOUND)
 endif()
 
 file(GLOB_RECURSE TRITON_OP_SRC src/triton_op/*.cc)
+#file(GLOB_RECURSE TRITON_OP_SRC src/triton_op/op_ninetoothed.cc src/triton_op/where_triton.cc)
 add_library(tritonOp SHARED ${TRITON_OP_SRC})
 
 # target_link_libraries(tritonOp PRIVATE

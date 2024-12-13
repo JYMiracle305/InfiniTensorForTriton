@@ -12,5 +12,7 @@ void whereKernel_py(const float *inputX, const float *inputY,
                  int outputsize, SmallArray inputXShape, SmallArray inputYShape,
                  SmallArray conditionShape, SmallArray outputShape, int xSize,
                  int ySize, int cSize);
+void whereKernel_test(const float *inputX, const float *inputY, float *output, int xSize,
+                 int ySize);
 
 } // namespace infini

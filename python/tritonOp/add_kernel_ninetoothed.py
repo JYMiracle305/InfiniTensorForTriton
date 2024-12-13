@@ -13,7 +13,8 @@ def add_kernel(
 ):
     z = x + y
 
-def add(x, y):
+def add(x: list, y: list) -> torch.Tensor:
+    print("add func start")
     lhs = torch.tensor(x, device='cuda')
     rhs = torch.tensor(y, device='cuda')
 
@@ -25,6 +26,8 @@ def main():
     size = 48
     x = np.random.rand(size) 
     y = np.random.rand(size) 
+    # x = [1, 2, 3]
+    # y = [4, 5, 6]
     print("the initial data is", x, y)
     output = add(x, y)
 

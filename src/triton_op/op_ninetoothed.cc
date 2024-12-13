@@ -10,7 +10,7 @@ namespace infini {
 
 void print_test_add_ninetoothed() {
     // 创建一个 scoped_interpreter 对象，构造时初始化 Python 解释器，析构时清理
-    py::scoped_interpreter guard{};
+    //py::scoped_interpreter guard{};
 
     // 获取当前工作目录
     char cwd[1024];
